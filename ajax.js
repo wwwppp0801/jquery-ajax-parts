@@ -69,10 +69,10 @@ $.ajaxTransport("parts",function(options){
                     if ((xhr.readyState===3||xhr.readyState===4)
                             &&!isAbort){
                         (function(){
-                            var delimiter=options.delimiter,responseText=xhr.responseText,offset=-1,lastOffset,i;
+                            var delimiter=options.delimiter,responseText=xhr.responseText,offset=-1,lastOffset,i=0,j;
                             if(delimiter){
                                 while(true){
-                                    for(i=0;i<=options.__partsIndex;i++){
+                                    for(;i<=options.__partsIndex;i++){
                                         lastOffset=(offset==-1)?0:offset+delimiter.length;
                                         offset=responseText.indexOf(delimiter,lastOffset);
                                         if(offset==-1){
@@ -82,8 +82,8 @@ $.ajaxTransport("parts",function(options){
                                     if(offset==-1 && xhr.readyState!==4){
                                         return;
                                     }
-                                    for(i=0;i<options.__partsCallback.length;i++){
-                                        options.__partsCallback[i].call(xhr,
+                                    for(j=0;j<options.__partsCallback.length;j++){
+                                        options.__partsCallback[j].call(xhr,
                                             responseText.substring(lastOffset,offset==-1?responseText.length:offset),
                                             options.__partsIndex,
                                             responseText);
@@ -92,7 +92,7 @@ $.ajaxTransport("parts",function(options){
                                     if(offset==-1){
                                         return;
                                     }
-                                    offset=-1;
+                                    //offset=-1;
                                 }
                             }else{
                                 for(i=0;i<options.__partsCallback.length;i++){
