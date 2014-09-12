@@ -1,6 +1,7 @@
 (function(){
 $.ajaxPrefilter("parts",function(s,originalSettings, jqXHR){
     s.__partsCallback=[];
+    s.__partsIndex=0;
     jqXHR.parts=function(callback){
         s.__partsCallback.push(callback);
     };
@@ -65,10 +66,40 @@ $.ajaxTransport("parts",function(options){
                 callback = function( _, isAbort ) {
                     var status, statusText, responses,i;
 
-                    if (xhr.readyState===3){
-                        for(i=0;i<options.__partsCallback.length;i++){
-                            options.__partsCallback[i](xhr.responseText);
-                        }
+                    if ((xhr.readyState===3||xhr.readyState===4)
+                            &&!isAbort){
+                        (function(){
+                            var delimiter=options.delimiter,responseText=xhr.responseText,offset=-1,lastOffset,i;
+                            if(delimiter){
+                                while(true){
+                                    for(i=0;i<=options.__partsIndex;i++){
+                                        lastOffset=(offset==-1)?0:offset+delimiter.length;
+                                        offset=responseText.indexOf(delimiter,lastOffset);
+                                        if(offset==-1){
+                                            break;
+                                        }
+                                    }
+                                    if(offset==-1 && xhr.readyState!==4){
+                                        return;
+                                    }
+                                    for(i=0;i<options.__partsCallback.length;i++){
+                                        options.__partsCallback[i].call(xhr,
+                                            responseText.substring(lastOffset,offset==-1?responseText.length:offset),
+                                            options.__partsIndex,
+                                            responseText);
+                                    }
+                                    options.__partsIndex++;
+                                    if(offset==-1){
+                                        return;
+                                    }
+                                    offset=-1;
+                                }
+                            }else{
+                                for(i=0;i<options.__partsCallback.length;i++){
+                                    options.__partsCallback[i].call(xhr,responseText);
+                                }
+                            }
+                        })();
                     } 
                     // Was never called and is aborted or complete
                     if ( callback && ( isAbort || xhr.readyState === 4 ) ) {

@@ -16,3 +16,16 @@ xhr.parts(function(data){
 });
 ```
 
+support <b>delimiter</b> param, auto split responseText to parts, every part will be processed by callback
+
+```javascript
+var xhr=$.ajax({
+    dataType:"parts",
+    delimiter:"/*3*/",
+    url:"test_data.php"
+});
+xhr.parts(function(part,index,all){
+    $("#container").append("<h1>"+index+"</h1>");
+    $("#container").append(part);
+});
+```
