@@ -1,0 +1,17 @@
+<div id="container">
+</div>
+<script src="http://libs.baidu.com/jquery/1.10.2/jquery.js"></script>
+<script src="ajax.js"></script>
+<script>
+    var xhr=$.ajax({
+        dataType:"parts",
+        delimiter:"/*3*/",
+        url:"test_data.php"
+    });
+    xhr.done(function(part,index,all){
+        //$("#container").append("<h1>"+index+"</h1>");
+        $("#container").append(part);
+    });
+
+</script>
+
