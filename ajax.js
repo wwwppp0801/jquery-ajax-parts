@@ -69,7 +69,16 @@ $.ajaxTransport("parts",function(options){
                     if ((xhr.readyState===3||xhr.readyState===4)
                             &&!isAbort){
                         (function(){
-                            var delimiter=options.delimiter,responseText=xhr.responseText,offset=-1,lastOffset,i=0,j;
+                            var delimiter=options.delimiter;
+							var responseText = "";
+							try{
+								//IE8,9下，当readyState==3时，还取不到reponseText，需要捕获异常
+								responseText = xhr.responseText;
+							}catch(e){}
+							if(responseText == ""){
+								return;
+							}
+							var offset=-1,lastOffset,i=0,j;
                             if(delimiter){
                                 while(true){
                                     for(;i<=options.__partsIndex;i++){
